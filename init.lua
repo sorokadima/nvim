@@ -2,10 +2,10 @@
 require("config.lazy")
 
   vim.keymap.set('n', '<leader>cp', function()
-    local path = vim.fn.expand('%:p')  
+    local path = vim.fn.expand('%:p')
     vim.fn.setreg('+', path)
     vim.notify('Copied: ' .. path)
-  end, { noremap = true })
+  end, { desc = "Copy absolute file path" })
 
   vim.keymap.set('n', '<leader>cr', function()
     local path = vim.fn.expand('%')  -- відносний шлях
