@@ -3,7 +3,7 @@ return {
   { "folke/tokyonight.nvim", enabled = false },
 
   -- Install Catppuccin theme
-  { "catppuccin/nvim", name = "catppuccin" },
+  { "catppuccin/nvim", name = "catppuccin", priority = 1000, lazy = false },
 
   -- Set it as default colorscheme
   {
