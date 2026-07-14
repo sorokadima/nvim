@@ -11,3 +11,33 @@ vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave" }, {
   command = "silent! wall",
   desc = "Auto-save when focus is lost",
 })
+
+-- Автоперемикання розкладки на англійську у вбудованих терміналах (lazygit тощо),
+-- бо в термінальному режимі клавіші йдуть напряму в програму повз langmapper.
+-- Потребує CLI `macism` (brew install macism).
+if vim.fn.executable("macism") == 1 then
+  local en = "com.apple.keylayout.ABC"
+  local saved_layout = nil
+  local grp = vim.api.nvim_create_augroup("term_layout_switch", { clear = true })
+
+  vim.api.nvim_create_autocmd("TermEnter", {
+    group = grp,
+    desc = "Перемкнути розкладку на ABC при вході в термінал",
+    callback = function()
+      saved_layout = vim.trim(vim.fn.system({ "macism" }))
+      if saved_layout ~= "" and saved_layout ~= en then
+        vim.fn.jobstart({ "macism", en })
+      end
+    end,
+  })
+
+  vim.api.nvim_create_autocmd({ "TermLeave", "TermClose" }, {
+    group = grp,
+    desc = "Повернути попередню розкладку при виході з термінала",
+    callback = function()
+      if saved_layout and saved_layout ~= "" and saved_layout ~= en then
+        vim.fn.jobstart({ "macism", saved_layout })
+      end
+    end,
+  })
+end
