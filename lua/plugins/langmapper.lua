@@ -20,8 +20,19 @@ return {
       escape(uk) .. ";" .. escape(en),
     }, ",")
 
+    -- langmapper.nvim за замовчуванням має fallback-layout лише для
+    -- російської (`ru`) — без цього блоку hack_keymap створював би
+    -- дубльовані <leader>-кейбінди тільки під російську розкладку,
+    -- а не під українську, тому <leader>gg і подібні не спрацьовували б.
     require("langmapper").setup({
       hack_keymap = true, -- перекладає й ліниво-завантажені мапінги плагінів
+      use_layouts = { "ua" },
+      layouts = {
+        ua = {
+          id = "com.apple.keylayout.Ukrainian-PC",
+          layout = "₴ЙЦУКЕНГШЩЗХЇ|ФІВАПРОЛДЖЄЯЧСМИТЬБЮ?'йцукенгшщзхїфівапролджєячсмитьбю/",
+        },
+      },
     })
     require("langmapper").hack_get_keymap()
 
