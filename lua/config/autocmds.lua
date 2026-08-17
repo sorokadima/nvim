@@ -12,6 +12,13 @@ vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave" }, {
   desc = "Auto-save when focus is lost",
 })
 
+-- Автопідхоплення змін файлів з диска (напр. від AI-агента в термінал-спліті)
+vim.o.autoread = true
+vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold" }, {
+  desc = "checktime: підхопити зовнішні зміни файлу",
+  command = "checktime",
+})
+
 -- Автоперемикання розкладки на англійську у вбудованих терміналах (lazygit тощо),
 -- бо в термінальному режимі клавіші йдуть напряму в програму повз langmapper.
 -- Потребує CLI `macism` (brew install macism).
