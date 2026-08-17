@@ -10,3 +10,8 @@ vim.keymap.set("t", "<Esc><Esc>", [[<C-\><C-n>]], { desc = "Вийти з тер
 vim.keymap.set("n", "<leader>ac", function()
   Snacks.terminal("claude", { cwd = LazyVim.root(), win = { position = "float" } })
 end, { desc = "Claude Code (float)" })
+
+-- Той самий toggle, але для звичайного shell (без claude)
+vim.keymap.set("n", "<leader>at", function()
+  Snacks.terminal(nil, { cwd = LazyVim.root(), win = { position = "float" } })
+end, { desc = "Terminal (float)" })
