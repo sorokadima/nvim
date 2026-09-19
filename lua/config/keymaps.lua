@@ -66,3 +66,24 @@ vim.keymap.set("n", "<leader>at", switch_to_shell, { desc = "Terminal (float)" }
 -- Сам одинарний Ctrl-q (без продовження) далі працює як вихід у Normal (мапінг вище).
 vim.keymap.set("t", "<C-q>c", switch_to_claude, { desc = "Перемкнутись на Claude Code" })
 vim.keymap.set("t", "<C-q>t", switch_to_shell, { desc = "Перемкнутись на звичайний термінал" })
+
+-- Перейменування слова в межах поточного файлу, без мовного сервера.
+-- :%s з межами слова \< \> не зачепить substring (count не стане частиною
+-- counter), а inccommand підсвічує всі збіги наживо, поки набираєш нове
+-- ім'я. Esc скасовує все, Enter застосовує.
+local function rename_in_file(flags)
+  return function()
+    local word = vim.fn.expand("<cword>")
+    if word == "" then
+      return
+    end
+    local cmd = ":%s/\\<" .. vim.fn.escape(word, "/\\.*$^~[]") .. "\\>//" .. flags
+    -- Курсор між двома / — там, де вводиться нове ім'я.
+    local keys = cmd .. string.rep("<Left>", #flags + 1)
+    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(keys, true, false, true), "n", false)
+  end
+end
+
+-- gI = ігнорувати 'ignorecase', тобто збіг з урахуванням регістру.
+vim.keymap.set("n", "<leader>rn", rename_in_file("gI"), { desc = "Перейменувати у файлі" })
+vim.keymap.set("n", "<leader>rc", rename_in_file("gcI"), { desc = "Перейменувати у файлі (питати кожен збіг)" })
