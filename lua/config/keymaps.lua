@@ -87,3 +87,20 @@ end
 -- gI = ігнорувати 'ignorecase', тобто збіг з урахуванням регістру.
 vim.keymap.set("n", "<leader>rn", rename_in_file("gI"), { desc = "Перейменувати у файлі" })
 vim.keymap.set("n", "<leader>rc", rename_in_file("gcI"), { desc = "Перейменувати у файлі (питати кожен збіг)" })
+
+-- LazyVim.root.git() падає назад на корінь проєкту, де .git може не бути.
+local function buf_git_root()
+  local buf = vim.api.nvim_buf_get_name(0)
+  local start = buf ~= "" and vim.fs.dirname(buf) or vim.uv.cwd()
+  local dot = vim.fs.find(".git", { path = start, upward = true })[1]
+  return dot and vim.fs.dirname(dot) or nil
+end
+
+vim.keymap.set("n", "<leader>gg", function()
+  local root = buf_git_root()
+  if root then
+    Snacks.lazygit({ cwd = root })
+  else
+    vim.notify("Git-репозиторію тут немає", vim.log.levels.WARN)
+  end
+end, { desc = "Lazygit (репо поточного файлу)" })
