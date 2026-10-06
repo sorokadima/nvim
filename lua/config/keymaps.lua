@@ -96,11 +96,16 @@ local function buf_git_root()
   return dot and vim.fs.dirname(dot) or nil
 end
 
+-- cwd=nil: lazygit відкриє останній репо — notARepository у ~/Library/Application Support/lazygit/config.yml
 vim.keymap.set("n", "<leader>gg", function()
-  local root = buf_git_root()
-  if root then
-    Snacks.lazygit({ cwd = root })
-  else
-    vim.notify("Git-репозиторію тут немає", vim.log.levels.WARN)
-  end
+  Snacks.lazygit({ cwd = buf_git_root() })
 end, { desc = "Lazygit (репо поточного файлу)" })
+
+vim.keymap.set("n", "<leader>ci", function()
+  if vim.fn.exists(":GutentagsUpdate") == 2 then
+    vim.cmd("GutentagsUpdate!")
+    vim.notify("Переіндексовую проєкт…")
+  else
+    vim.notify("Тут індекс не ведеться — проєкт без .git?", vim.log.levels.WARN)
+  end
+end, { desc = "Переіндексувати теги проєкту" })
