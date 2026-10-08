@@ -67,6 +67,31 @@ vim.keymap.set("n", "<leader>at", switch_to_shell, { desc = "Terminal (float)" }
 vim.keymap.set("t", "<C-q>c", switch_to_claude, { desc = "Перемкнутись на Claude Code" })
 vim.keymap.set("t", "<C-q>t", switch_to_shell, { desc = "Перемкнутись на звичайний термінал" })
 
+-- Якщо поточний буфер не в git-репо, LazyVim.root.git() не знаходить корінь
+-- і Snacks.lazygit відкриває lazygit у cwd — а там "Create a new git repository? (y/N)".
+-- Новий репо тут ніколи не потрібен, тож падаємо на git-корінь останнього
+-- відкритого файлу (той самий список, що й у Snacks Projects picker, <leader>fp).
+local function last_git_root()
+  for _, file in ipairs(vim.v.oldfiles) do
+    local root_dir = Snacks.git.get_root(file)
+    if root_dir then
+      return root_dir
+    end
+  end
+end
+
+local function lazygit_root()
+  -- LazyVim.root.git() сам ніколи не повертає nil: якщо .git не знайдено,
+  -- він тихо віддає звичайний root (cwd) — тому шукаємо .git вручну.
+  local found = vim.fs.find(".git", { path = LazyVim.root(), upward = true })[1]
+  if found then
+    return vim.fn.fnamemodify(found, ":h")
+  end
+  return last_git_root()
+end
+
+vim.keymap.set("n", "<leader>gg", function() Snacks.lazygit({ cwd = lazygit_root() }) end, { desc = "Lazygit (Root Dir)" })
+
 -- Перейменування слова в межах поточного файлу, без мовного сервера.
 -- :%s з межами слова \< \> не зачепить substring (count не стане частиною
 -- counter), а inccommand підсвічує всі збіги наживо, поки набираєш нове
