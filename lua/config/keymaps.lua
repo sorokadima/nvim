@@ -25,7 +25,20 @@ end
 -- через що вікно зливається з чорним фоном по боках і знизу. Просимо повну рамку.
 -- Стиль "minimal" (дефолт для плаваючих вікон Snacks) вимикає номери рядків —
 -- вмикаємо назад, щоб у Normal-режимі термінала можна було переходити по номеру (:42, 42G).
-local term_win = { position = "float", border = "rounded", wo = { number = true } }
+local function stopinsert_then_hide(self)
+  vim.cmd("stopinsert")
+  self:hide()
+end
+
+local term_win = {
+  position = "float",
+  border = "rounded",
+  wo = { number = true },
+  keys = {
+    hide_slash = { "<C-/>", stopinsert_then_hide, desc = "Hide Terminal", mode = "t" },
+    hide_underscore = { "<c-_>", stopinsert_then_hide, desc = "which_key_ignore", mode = "t" },
+  },
+}
 
 -- Ховає всі відкриті плаваючі термінали, крім вказаного — щоб при перемиканні
 -- вони не стекались одне на одному (Claude і shell — різні snacks-термінали).
@@ -43,6 +56,7 @@ local function switch_terminal(cmd)
   return function()
     local term, created = Snacks.terminal.get(cmd, { cwd = root(), win = term_win })
     if not created and term:win_valid() and vim.api.nvim_get_current_buf() == term.buf then
+      vim.cmd("stopinsert")
       term:hide()
       return
     end
